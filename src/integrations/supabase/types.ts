@@ -154,6 +154,93 @@ export type Database = {
         }
         Relationships: []
       }
+      businesses: {
+        Row: {
+          id: string
+          name: string
+          slug: string
+          owner_id: string
+          logo_url: string | null
+          primary_color: string
+          accent_color: string
+          welcome_text: string
+          published: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          slug: string
+          owner_id: string
+          logo_url?: string | null
+          primary_color?: string
+          accent_color?: string
+          welcome_text?: string
+          published?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          slug?: string
+          owner_id?: string
+          logo_url?: string | null
+          primary_color?: string
+          accent_color?: string
+          welcome_text?: string
+          published?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+      business_members: {
+        Row: {
+          id: string
+          business_id: string
+          user_id: string
+          role: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          business_id: string
+          user_id: string
+          role?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          business_id?: string
+          user_id?: string
+          role?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      business_links: {
+        Row: {
+          id: string
+          business_id: string
+          label: string
+          url: string
+          sort_order: number
+        }
+        Insert: {
+          id?: string
+          business_id: string
+          label: string
+          url: string
+          sort_order?: number
+        }
+        Update: {
+          id?: string
+          business_id?: string
+          label?: string
+          url?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
