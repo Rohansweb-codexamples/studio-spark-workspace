@@ -48,7 +48,7 @@ function Sites() {
       .insert({ name: name.trim(), slug, owner_id: user.id })
       .select()
       .single();
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     await supabase.from("site_files").insert(starterFiles(name.trim()).map((f) => ({ ...f, site_id: data.id })));
     navigate({ to: "/sites/$siteId", params: { siteId: data.id } });
   }

@@ -34,7 +34,7 @@ function Chat() {
   async function loadChannels() {
     const { data } = await supabase.from("channels").select("id,name").order("created_at");
     setChannels(data ?? []);
-    if (!active && data?.length) setActive(data[0].id);
+    if (!active && data?.length) setActive(data[0]!.id);
   }
 
   useEffect(() => {
@@ -90,7 +90,7 @@ function Chat() {
       .insert({ body, channel_id: active, user_id: user.id })
       .select()
       .single();
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setMessages((prev) => (prev.some((x) => x.id === data.id) ? prev : [...prev, data]));
   }
 
@@ -98,7 +98,7 @@ function Chat() {
     const name = prompt("Channel name")?.trim().toLowerCase().replace(/\s+/g, "-");
     if (!name || !user) return;
     const { data, error } = await supabase.from("channels").insert({ name, created_by: user.id }).select().single();
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     await loadChannels();
     setActive(data.id);
   }

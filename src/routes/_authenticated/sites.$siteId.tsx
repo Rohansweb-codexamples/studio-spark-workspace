@@ -44,8 +44,8 @@ function Repo() {
   async function save() {
     const ids = Object.keys(dirty);
     for (const id of ids) {
-      const { error } = await supabase.from("site_files").update({ content: dirty[id], updated_at: new Date().toISOString() }).eq("id", id);
-      if (error) return toast.error(error.message);
+      const { error } = await supabase.from("site_files").update({ content: dirty[id]!, updated_at: new Date().toISOString() }).eq("id", id);
+      if (error) { toast.error(error.message); return; }
     }
     setFiles(merged);
     setDirty({});
@@ -60,7 +60,7 @@ function Repo() {
       .eq("id", siteId)
       .select("id,name,slug,published,published_at")
       .single();
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setSite(data);
     toast.success("Deployed! Your site is live.");
   }
@@ -69,7 +69,7 @@ function Repo() {
     const path = prompt("File name (e.g. about.html, theme.css)")?.trim();
     if (!path) return;
     const { data, error } = await supabase.from("site_files").insert({ site_id: siteId, path, content: "" }).select("id,path,content").single();
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setFiles((f) => [...f, data].sort((a, b) => a.path.localeCompare(b.path)));
     setActiveId(data.id);
   }
