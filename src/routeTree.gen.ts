@@ -12,10 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
+import { Route as TSlugRouteImport } from './routes/t.$slug'
+import { Route as AuthenticatedDesignsIndexRouteImport } from './routes/_authenticated/designs.index'
+import { Route as AuthenticatedDesignsDesignIdRouteImport } from './routes/_authenticated/designs.$designId'
 import { Route as AuthenticatedSitesIndexRouteImport } from './routes/_authenticated/sites.index'
 import { Route as AuthenticatedSitesSiteIdRouteImport } from './routes/_authenticated/sites.$siteId'
+import { Route as AuthenticatedTeamsIndexRouteImport } from './routes/_authenticated/teams.index'
+import { Route as AuthenticatedTeamsSlugRouteImport } from './routes/_authenticated/teams.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -31,6 +37,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedChatRoute = AuthenticatedChatRouteImport.update({
   id: '/chat',
   path: '/chat',
@@ -41,6 +52,23 @@ const SSlugRoute = SSlugRouteImport.update({
   path: '/s/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TSlugRoute = TSlugRouteImport.update({
+  id: '/t/$slug',
+  path: '/t/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDesignsIndexRoute =
+  AuthenticatedDesignsIndexRouteImport.update({
+    id: '/designs/',
+    path: '/designs/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDesignsDesignIdRoute =
+  AuthenticatedDesignsDesignIdRouteImport.update({
+    id: '/designs/$designId',
+    path: '/designs/$designId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedSitesIndexRoute = AuthenticatedSitesIndexRouteImport.update({
   id: '/sites/',
   path: '/sites/',
@@ -52,47 +80,105 @@ const AuthenticatedSitesSiteIdRoute =
     path: '/sites/$siteId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedTeamsIndexRoute = AuthenticatedTeamsIndexRouteImport.update({
+  id: '/teams/',
+  path: '/teams/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTeamsSlugRoute = AuthenticatedTeamsSlugRouteImport.update({
+  id: '/teams/$slug',
+  path: '/teams/$slug',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/chat': typeof AuthenticatedChatRoute
   '/s/$slug': typeof SSlugRoute
+  '/t/$slug': typeof TSlugRoute
+  '/designs/$designId': typeof AuthenticatedDesignsDesignIdRoute
   '/sites/$siteId': typeof AuthenticatedSitesSiteIdRoute
+  '/teams/$slug': typeof AuthenticatedTeamsSlugRoute
+  '/designs/': typeof AuthenticatedDesignsIndexRoute
   '/sites/': typeof AuthenticatedSitesIndexRoute
+  '/teams/': typeof AuthenticatedTeamsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/chat': typeof AuthenticatedChatRoute
   '/s/$slug': typeof SSlugRoute
+  '/t/$slug': typeof TSlugRoute
+  '/designs/$designId': typeof AuthenticatedDesignsDesignIdRoute
   '/sites/$siteId': typeof AuthenticatedSitesSiteIdRoute
+  '/teams/$slug': typeof AuthenticatedTeamsSlugRoute
+  '/designs': typeof AuthenticatedDesignsIndexRoute
   '/sites': typeof AuthenticatedSitesIndexRoute
+  '/teams': typeof AuthenticatedTeamsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/chat': typeof AuthenticatedChatRoute
   '/s/$slug': typeof SSlugRoute
+  '/t/$slug': typeof TSlugRoute
+  '/_authenticated/designs/$designId': typeof AuthenticatedDesignsDesignIdRoute
   '/_authenticated/sites/$siteId': typeof AuthenticatedSitesSiteIdRoute
+  '/_authenticated/teams/$slug': typeof AuthenticatedTeamsSlugRoute
+  '/_authenticated/designs/': typeof AuthenticatedDesignsIndexRoute
   '/_authenticated/sites/': typeof AuthenticatedSitesIndexRoute
+  '/_authenticated/teams/': typeof AuthenticatedTeamsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/chat' | '/s/$slug' | '/sites/$siteId' | '/sites/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/chat'
+    | '/s/$slug'
+    | '/t/$slug'
+    | '/designs/$designId'
+    | '/sites/$siteId'
+    | '/teams/$slug'
+    | '/designs/'
+    | '/sites/'
+    | '/teams/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/chat' | '/s/$slug' | '/sites/$siteId' | '/sites'
+  to:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/chat'
+    | '/s/$slug'
+    | '/t/$slug'
+    | '/designs/$designId'
+    | '/sites/$siteId'
+    | '/teams/$slug'
+    | '/designs'
+    | '/sites'
+    | '/teams'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/admin'
     | '/_authenticated/chat'
     | '/s/$slug'
+    | '/t/$slug'
+    | '/_authenticated/designs/$designId'
     | '/_authenticated/sites/$siteId'
+    | '/_authenticated/teams/$slug'
+    | '/_authenticated/designs/'
     | '/_authenticated/sites/'
+    | '/_authenticated/teams/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -100,6 +186,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
   SSlugRoute: typeof SSlugRoute
+  TSlugRoute: typeof TSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -125,6 +212,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/chat': {
       id: '/_authenticated/chat'
       path: '/chat'
@@ -138,6 +232,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/s/$slug'
       preLoaderRoute: typeof SSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/t/$slug': {
+      id: '/t/$slug'
+      path: '/t/$slug'
+      fullPath: '/t/$slug'
+      preLoaderRoute: typeof TSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/designs/': {
+      id: '/_authenticated/designs/'
+      path: '/designs'
+      fullPath: '/designs/'
+      preLoaderRoute: typeof AuthenticatedDesignsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/designs/$designId': {
+      id: '/_authenticated/designs/$designId'
+      path: '/designs/$designId'
+      fullPath: '/designs/$designId'
+      preLoaderRoute: typeof AuthenticatedDesignsDesignIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/sites/': {
       id: '/_authenticated/sites/'
@@ -153,19 +268,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSitesSiteIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/teams/': {
+      id: '/_authenticated/teams/'
+      path: '/teams'
+      fullPath: '/teams/'
+      preLoaderRoute: typeof AuthenticatedTeamsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teams/$slug': {
+      id: '/_authenticated/teams/$slug'
+      path: '/teams/$slug'
+      fullPath: '/teams/$slug'
+      preLoaderRoute: typeof AuthenticatedTeamsSlugRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedChatRoute: typeof AuthenticatedChatRoute
+  AuthenticatedDesignsDesignIdRoute: typeof AuthenticatedDesignsDesignIdRoute
   AuthenticatedSitesSiteIdRoute: typeof AuthenticatedSitesSiteIdRoute
+  AuthenticatedTeamsSlugRoute: typeof AuthenticatedTeamsSlugRoute
+  AuthenticatedDesignsIndexRoute: typeof AuthenticatedDesignsIndexRoute
   AuthenticatedSitesIndexRoute: typeof AuthenticatedSitesIndexRoute
+  AuthenticatedTeamsIndexRoute: typeof AuthenticatedTeamsIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedChatRoute: AuthenticatedChatRoute,
+  AuthenticatedDesignsDesignIdRoute: AuthenticatedDesignsDesignIdRoute,
   AuthenticatedSitesSiteIdRoute: AuthenticatedSitesSiteIdRoute,
+  AuthenticatedTeamsSlugRoute: AuthenticatedTeamsSlugRoute,
+  AuthenticatedDesignsIndexRoute: AuthenticatedDesignsIndexRoute,
   AuthenticatedSitesIndexRoute: AuthenticatedSitesIndexRoute,
+  AuthenticatedTeamsIndexRoute: AuthenticatedTeamsIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -177,6 +316,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   SSlugRoute: SSlugRoute,
+  TSlugRoute: TSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

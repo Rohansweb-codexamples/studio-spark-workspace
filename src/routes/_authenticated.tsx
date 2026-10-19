@@ -1,7 +1,8 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { MessagesSquare, FolderGit2, LogOut, Palette } from "lucide-react";
+import { MessagesSquare, FolderGit2, LogOut, Palette, Users, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -10,17 +11,25 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 const nav = [
+  { to: "/teams", icon: Users, label: "Teams" },
   { to: "/chat", icon: MessagesSquare, label: "Chat" },
+  { to: "/designs", icon: Palette, label: "Designs" },
   { to: "/sites", icon: FolderGit2, label: "Sites" },
 ] as const;
 
 function Layout() {
   const { user, loading } = useAuth();
+  const isAdmin = useIsAdmin();
   const navigate = useNavigate();
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
   }, [loading, user, navigate]);
   if (loading || !user) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
 
   return (
     <div className="flex h-screen">
@@ -37,18 +46,25 @@ function Layout() {
             <n.icon className="h-5 w-5" />
           </Link>
         ))}
-        <span title="Design canvas — coming soon" className="flex h-10 w-10 items-center justify-center rounded-lg opacity-40">
-          <Palette className="h-5 w-5" />
-        </span>
+        {isAdmin && (
+          <Link
+            to="/admin"
+            title="Admin"
+            className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-secondary"
+            activeProps={{ className: "bg-accent text-accent-foreground" }}
+          >
+            <ShieldCheck className="h-5 w-5" />
+          </Link>
+        )}
         <button
           title="Sign out"
-          onClick={() => supabase.auth.signOut()}
+          onClick={signOut}
           className="mt-auto flex h-10 w-10 items-center justify-center rounded-lg hover:bg-secondary"
         >
           <LogOut className="h-5 w-5" />
         </button>
       </aside>
-      <main className="min-w-0 flex-1">
+      <main className="min-w-0 flex-1 overflow-y-auto">
         <Outlet />
       </main>
     </div>
