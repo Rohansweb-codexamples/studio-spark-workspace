@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/chat")({
   validateSearch: (s: Record<string, unknown>): { channel?: string } =>
-    typeof s.channel === "string" ? { channel: s.channel } : {},
+    typeof s["channel"] === "string" ? { channel: s["channel"] } : {},
   head: () => ({
     meta: [
       { title: "Chat — Studio" },

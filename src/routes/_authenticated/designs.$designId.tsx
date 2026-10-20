@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/designs/$designId")({
   component: Canvas,
 });
 
-type Shape = { id: string; kind: "rect" | "ellipse" | "text"; x: number; y: number; w: number; h: number; fill: string; text?: string };
+type Shape = { id: string; kind: "rect" | "ellipse" | "text"; x: number; y: number; w: number; h: number; fill: string; text?: string | undefined };
 const swatches = ["#e8603c", "#1f2937", "#f5c84b", "#4c8bf5", "#3fa37a", "#ffffff"];
 
 function Canvas() {
