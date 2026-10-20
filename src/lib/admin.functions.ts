@@ -46,7 +46,7 @@ export const listAccounts = createServerFn({ method: "POST" })
     return data.users.map((u) => ({
       id: u.id,
       email: u.email ?? "",
-      name: (u.user_metadata?.full_name as string) ?? "",
+      name: (u.user_metadata?.["full_name"] as string) ?? "",
       last_sign_in_at: u.last_sign_in_at ?? null,
     }));
   });

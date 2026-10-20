@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/chat")({
+  validateSearch: (s: Record<string, unknown>): { channel?: string } =>
+    typeof s["channel"] === "string" ? { channel: s["channel"] } : {},
   head: () => ({
     meta: [
       { title: "Chat — Studio" },
@@ -19,21 +21,22 @@ export const Route = createFileRoute("/_authenticated/chat")({
   component: Chat,
 });
 
-type Channel = { id: string; name: string };
+type Channel = { id: string; name: string; team_id: string | null; teams: { name: string } | null };
 type Message = { id: string; body: string; created_at: string; user_id: string; channel_id: string };
 
 function Chat() {
   const { user } = useAuth();
+  const search = Route.useSearch();
   const [channels, setChannels] = useState<Channel[]>([]);
-  const [active, setActive] = useState<string | null>(null);
+  const [active, setActive] = useState<string | null>(search.channel ?? null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [names, setNames] = useState<Record<string, string>>({});
   const [text, setText] = useState("");
   const bottom = useRef<HTMLDivElement>(null);
 
   async function loadChannels() {
-    const { data } = await supabase.from("channels").select("id,name").order("created_at");
-    setChannels(data ?? []);
+    const { data } = await supabase.from("channels").select("id,name,team_id,teams(name)").order("created_at");
+    setChannels((data as Channel[]) ?? []);
     if (!active && data?.length) setActive(data[0]!.id);
   }
 
@@ -97,33 +100,44 @@ function Chat() {
   async function newChannel() {
     const name = prompt("Channel name")?.trim().toLowerCase().replace(/\s+/g, "-");
     if (!name || !user) return;
-    const { data, error } = await supabase.from("channels").insert({ name, created_by: user.id }).select().single();
+    const teamId = channels.find((c) => c.id === active)?.team_id ?? null;
+    const { data, error } = await supabase.from("channels").insert({ name, created_by: user.id, team_id: teamId }).select().single();
     if (error) { toast.error(error.message); return; }
     await loadChannels();
     setActive(data.id);
   }
 
   const current = channels.find((c) => c.id === active);
+  const groups = channels.reduce<Record<string, Channel[]>>((acc, c) => {
+    const k = c.teams?.name ?? "Everyone";
+    (acc[k] ??= []).push(c);
+    return acc;
+  }, {});
 
   return (
     <div className="flex h-full">
-      <div className="w-60 border-r bg-card p-3">
+      <div className="w-60 overflow-y-auto border-r bg-card p-3">
         <div className="mb-2 flex items-center justify-between px-2">
           <h2 className="text-sm font-semibold">Channels</h2>
           <button onClick={newChannel} className="rounded p-1 hover:bg-secondary" title="New channel">
             <Plus className="h-4 w-4" />
           </button>
         </div>
-        {channels.map((c) => (
-          <button
-            key={c.id}
-            onClick={() => setActive(c.id)}
-            className={`flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-sm ${
-              c.id === active ? "bg-accent font-medium text-accent-foreground" : "text-muted-foreground hover:bg-secondary"
-            }`}
-          >
-            <Hash className="h-3.5 w-3.5" /> {c.name}
-          </button>
+        {Object.entries(groups).map(([g, list]) => (
+          <div key={g} className="mb-3">
+            <p className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{g}</p>
+            {list.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => setActive(c.id)}
+                className={`flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-sm ${
+                  c.id === active ? "bg-accent font-medium text-accent-foreground" : "text-muted-foreground hover:bg-secondary"
+                }`}
+              >
+                <Hash className="h-3.5 w-3.5" /> {c.name}
+              </button>
+            ))}
+          </div>
         ))}
       </div>
       <div className="flex min-w-0 flex-1 flex-col">

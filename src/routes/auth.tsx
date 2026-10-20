@@ -13,9 +13,9 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — Studio" },
-      { name: "description", content: "Sign in or create your Studio account." },
+      { name: "description", content: "Sign in to your Studio account." },
       { property: "og:title", content: "Sign in — Studio" },
-      { property: "og:description", content: "Sign in or create your Studio account." },
+      { property: "og:description", content: "Sign in to your Studio account." },
     ],
   }),
   component: AuthPage,
@@ -24,31 +24,19 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"in" | "up">("in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (user) navigate({ to: "/chat" });
+    if (user) navigate({ to: "/teams" });
   }, [user, navigate]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    if (mode === "up") {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: window.location.origin + "/chat", data: { full_name: name } },
-      });
-      if (error) toast.error(error.message);
-      else toast.success("Check your email to confirm your account.");
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) toast.error(error.message);
-    }
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) toast.error(error.message === "Invalid login credentials" ? "Wrong email or password" : error.message);
     setBusy(false);
   }
 
@@ -61,25 +49,20 @@ function AuthPage() {
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <Link to="/" className="font-display text-lg font-semibold">studio<span className="text-primary">.</span></Link>
-        <h1 className="mt-8 text-3xl font-semibold">{mode === "in" ? "Welcome back" : "Create account"}</h1>
-        <div className="mt-6 space-y-2">
+        <h1 className="mt-8 text-3xl font-semibold">Welcome back</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Accounts are created by your admin.</p>
+        <form onSubmit={submit} className="mt-6 space-y-4">
+          <div className="space-y-1.5"><Label>Email</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
+          <div className="space-y-1.5"><Label>Password</Label><Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required /></div>
+          <Button className="w-full" disabled={busy}>Sign in</Button>
+        </form>
+        <div className="my-6 text-center text-xs text-muted-foreground">or</div>
+        <div className="space-y-2">
           <Button variant="outline" className="w-full" onClick={() => oauth("google")}>Continue with Google</Button>
           <button type="button" className="lovable-auth-button w-full" onClick={() => oauth("lovable")}>
             Continue with Lovable
           </button>
         </div>
-        <div className="my-6 text-center text-xs text-muted-foreground">or with email</div>
-        <form onSubmit={submit} className="space-y-4">
-          {mode === "up" && (
-            <div className="space-y-1.5"><Label>Name</Label><Input value={name} onChange={(e) => setName(e.target.value)} required /></div>
-          )}
-          <div className="space-y-1.5"><Label>Email</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
-          <div className="space-y-1.5"><Label>Password</Label><Input type="password" minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} required /></div>
-          <Button className="w-full" disabled={busy}>{mode === "in" ? "Sign in" : "Sign up"}</Button>
-        </form>
-        <button className="mt-4 text-sm text-muted-foreground hover:text-foreground" onClick={() => setMode(mode === "in" ? "up" : "in")}>
-          {mode === "in" ? "New here? Create an account" : "Have an account? Sign in"}
-        </button>
       </div>
     </div>
   );

@@ -12,3 +12,6 @@
 ## Architecture
 - Signed-in pages live under `src/routes/_authenticated/` (client-only guard) — keeps auth checks in one layout.
 - Deployed sites are stored as rows in `site_files` and rendered at `/s/$slug` by inlining CSS/JS into a sandboxed iframe (`src/lib/site-bundle.ts`) — no separate hosting needed.
+- Admin-only actions (creating accounts, listing users) go through `src/lib/admin.functions.ts`, which checks `has_role` before using the service client — public sign-up is disabled so this is the only way accounts are made.
+- Team privacy is enforced in database policies via `is_team_member`; channels/designs with a null team are workspace-wide.
+- `vercel.json` proxies every request to the Lovable-published URL — the app itself runs on Lovable hosting, not Vercel functions.
