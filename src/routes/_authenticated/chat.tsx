@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/chat")({
+  validateSearch: (s: Record<string, unknown>): { channel?: string } =>
+    typeof s.channel === "string" ? { channel: s.channel } : {},
   head: () => ({
     meta: [
       { title: "Chat — Studio" },
@@ -19,21 +21,22 @@ export const Route = createFileRoute("/_authenticated/chat")({
   component: Chat,
 });
 
-type Channel = { id: string; name: string };
+type Channel = { id: string; name: string; team_id: string | null; teams: { name: string } | null };
 type Message = { id: string; body: string; created_at: string; user_id: string; channel_id: string };
 
 function Chat() {
   const { user } = useAuth();
+  const search = Route.useSearch();
   const [channels, setChannels] = useState<Channel[]>([]);
-  const [active, setActive] = useState<string | null>(null);
+  const [active, setActive] = useState<string | null>(search.channel ?? null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [names, setNames] = useState<Record<string, string>>({});
   const [text, setText] = useState("");
   const bottom = useRef<HTMLDivElement>(null);
 
   async function loadChannels() {
-    const { data } = await supabase.from("channels").select("id,name").order("created_at");
-    setChannels(data ?? []);
+    const { data } = await supabase.from("channels").select("id,name,team_id,teams(name)").order("created_at");
+    setChannels((data as Channel[]) ?? []);
     if (!active && data?.length) setActive(data[0]!.id);
   }
 
